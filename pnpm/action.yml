@@ -82,8 +82,3 @@ runs:
       working-directory: ${{ env.thaitype_action_node_path }}
       run: ${{ inputs.command }}
       shell: bash
-
-    - name: Remove tmp path
-      run: |
-        rm -rf ${{ env.thaitype_action_node_path }}
-      shell: bash
