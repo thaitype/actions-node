@@ -8,7 +8,7 @@ inputs:
   ref:
     description: "Ref to checkout"
     required: true
-  token:
+  github-token:
     description: "Personal Access Token"
     required: true
   node-version:
@@ -50,7 +50,7 @@ runs:
       with:
         repository: ${{ inputs.repository }}
         ref: ${{ inputs.ref }}
-        token: ${{ inputs.token }}
+        token: ${{ inputs.github-token }}
         path: ${{ env.thaitype_action_node_path }}
 
     - name: Setup pnpm
