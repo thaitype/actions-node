@@ -1,0 +1,89 @@
+name: "Actions Node on pnpm"
+description: "Run Node on Github Actions"
+
+inputs:
+  repository:
+    description: "Repository to checkout"
+    required: true
+  ref:
+    description: "Ref to checkout"
+    required: false
+  token:
+    description: "Personal Access Token"
+    required: false
+  node-version:
+    description: "Node version"
+    required: false
+    default: "latest"
+  pnpm-version:
+    description: "pnpm version"
+    required: false
+    default: "latest"
+  cache-dependency-path:
+    description: "Path to pnpm-lock.yaml"
+    required: false
+    default: "pnpm-lock.yaml"
+  frozen-lockfile:
+    description: "Whether to use frozen lockfile"
+    required: false
+    default: true
+  command:
+    description: "Custom Command"
+    required: false
+    default: "node index.js"
+
+outputs:
+  command:
+    description: "Execute the command"
+    value: ${{ steps.command.outputs.result }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set tmp path
+      run: |
+        echo "thaitype_action_node_path=node-$(date +%s)" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Checkout node repository
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ inputs.repository }}
+        ref: ${{ inputs.ref }}
+        token: ${{ inputs.token }}
+        path: ${{ env.thaitype_action_node_path }}
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: ${{ inputs.pnpm-version }}
+
+    - name: Use Node.js ${{ inputs.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: "pnpm"
+        cache-dependency-path: "${{ env.thaitype_action_node_path }}/${{ inputs.cache-dependency-path }}"
+
+    - name: Install dependencies with frozen lockfile
+      if: inputs.frozen-lockfile == true
+      working-directory: ${{ env.thaitype_action_node_path }}
+      run: pnpm install --frozen-lockfile
+      shell: bash
+
+    - name: Install dependencies without frozen lockfile
+      if: inputs.frozen-lockfile == false
+      working-directory: ${{ env.thaitype_action_node_path }}
+      run: pnpm install
+      shell: bash
+
+    - name: Execute the command
+      id: command
+      working-directory: ${{ env.thaitype_action_node_path }}
+      run: ${{ inputs.command }}
+      shell: bash
+
+    - name: Remove tmp path
+      run: |
+        rm -rf ${{ env.thaitype_action_node_path }}
+      shell: bash
