@@ -7,10 +7,10 @@ inputs:
     required: true
   ref:
     description: "Ref to checkout"
-    required: false
+    required: true
   token:
     description: "Personal Access Token"
-    required: false
+    required: true
   node-version:
     description: "Node version"
     required: false
