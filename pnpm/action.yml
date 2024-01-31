@@ -59,20 +59,16 @@ runs:
         version: ${{ inputs.pnpm-version }}
 
     - name: Use Node.js ${{ inputs.node-version }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
         cache: "pnpm"
         cache-dependency-path: "${{ env.thaitype_action_node_path }}/${{ inputs.cache-dependency-path }}"
 
-    - name: Install dependencies with frozen lockfile
-      if: inputs.frozen-lockfile == true
-      working-directory: ${{ env.thaitype_action_node_path }}
-      run: pnpm install --frozen-lockfile
+    - run: echo "check lockfile" && ls ${{ env.thaitype_action_node_path }}/${{ inputs.cache-dependency-path }}
       shell: bash
 
-    - name: Install dependencies without frozen lockfile
-      if: inputs.frozen-lockfile == false
+    - name: Install dependencies
       working-directory: ${{ env.thaitype_action_node_path }}
       run: pnpm install
       shell: bash
